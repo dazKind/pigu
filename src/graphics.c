@@ -7,10 +7,10 @@ int piguGetScreenSize(int *width, int *height)
    uint32_t screen_width = 0, screen_height = 0;
 
    // this function is just a wrapper around this bcm api function
-   success = graphics_get_display_size(0, &screen_width, &screen_height);
+   //success = graphics_get_display_size(0, &screen_width, &screen_height);
 
-   *width = screen_width;
-   *height = screen_height;
+   //*width = screen_width;
+   //*height = screen_height;
    return success;
 }
 
@@ -22,12 +22,12 @@ int piguCreateWindow(int width, int height, int red, int green,int blue, int alp
    EGLBoolean result;
    EGLint num_config;
 
-   DISPMANX_UPDATE_HANDLE_T dispman_update;
-   VC_RECT_T dst_rect;
-   VC_RECT_T src_rect;
+   //DISPMANX_UPDATE_HANDLE_T dispman_update;
+   //VC_RECT_T dst_rect;
+   //VC_RECT_T src_rect;
 
-   if(0 > graphics_get_display_size(0, &state.screen_width, &state.screen_height))
-      return -1;
+   //if(0 > graphics_get_display_size(0, &state.screen_width, &state.screen_height))
+      //return -1;
 
    EGLint attribute_list[20];
    int i;
@@ -85,32 +85,36 @@ int piguCreateWindow(int width, int height, int red, int green,int blue, int alp
    if(state.context==EGL_NO_CONTEXT)
       return -1;
 
-   dst_rect.x = 0;
-   dst_rect.y = 0;
-   dst_rect.width = state.screen_width;
-   dst_rect.height = state.screen_height;
+   //dst_rect.x = 0;
+   //dst_rect.y = 0;
+   //dst_rect.width = state.screen_width;
+   //dst_rect.height = state.screen_height;
       
-   src_rect.x = 0;
-   src_rect.y = 0;
-   src_rect.width = width << 16;
-   src_rect.height = height << 16;        
+   //src_rect.x = 0;
+   //src_rect.y = 0;
+   //src_rect.width = width << 16;
+   //src_rect.height = height << 16;        
 
-   state.dispman_display = vc_dispmanx_display_open( 0 /* LCD */);
-   dispman_update = vc_dispmanx_update_start( 0 );
+   //state.dispman_display = vc_dispmanx_display_open( 0 /* LCD */);
+   //dispman_update = vc_dispmanx_update_start( 0 );
 
-   VC_DISPMANX_ALPHA_T alpha_flags;
-   alpha_flags.flags = DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS;
-   alpha_flags.opacity = 255;
-   alpha_flags.mask = 0;
+   //VC_DISPMANX_ALPHA_T alpha_flags;
+   //alpha_flags.flags = DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS;
+   //alpha_flags.opacity = 255;
+   //alpha_flags.mask = 0;
 
-   state.dispman_element = vc_dispmanx_element_add ( dispman_update, state.dispman_display, 0/*layer*/, &dst_rect, 0/*src*/, &src_rect, DISPMANX_PROTECTION_NONE, &alpha_flags /*alpha*/, 0/*clamp*/, (DISPMANX_TRANSFORM_T)0/*transform*/);
+   //state.dispman_element = vc_dispmanx_element_add ( dispman_update, state.dispman_display, 0/*layer*/, &dst_rect, 0/*src*/, &src_rect, DISPMANX_PROTECTION_NONE, &alpha_flags /*alpha*/, 0/*clamp*/, (DISPMANX_TRANSFORM_T)0/*transform*/);
       
-   state.nativewindow.element = state.dispman_element;
-   state.nativewindow.width = width;
-   state.nativewindow.height = height;
-   vc_dispmanx_update_submit_sync( dispman_update );
+   //state.nativewindow.element = state.dispman_element;
+   //state.nativewindow.width = width;
+   //state.nativewindow.height = height;
+   //vc_dispmanx_update_submit_sync( dispman_update );
 
-   state.surface = eglCreateWindowSurface( state.display, state.config, &state.nativewindow, NULL );
+   state.nativewindow = (fbdev_window *)calloc(1, sizeof(fbdev_window));
+   state.nativewindow->width = width;
+   state.nativewindow->height = height;
+
+   state.surface = eglCreateWindowSurface( state.display, state.config, state.nativewindow, NULL );
    if(state.surface == EGL_NO_SURFACE)
       return -1;
 
@@ -139,9 +143,8 @@ int piguChangeResolution(int width, int height)
 {
    EGLBoolean result;
 
-   VC_RECT_T dst_rect;
-   VC_RECT_T src_rect;
-
+   //VC_RECT_T dst_rect;
+   //VC_RECT_T src_rect;
 
    if(!state.window_open)
       return 0;
@@ -150,6 +153,7 @@ int piguChangeResolution(int width, int height)
 
    eglDestroySurface(state.display, state.surface);
 
+   /*
    dst_rect.x = 0;
    dst_rect.y = 0;
    dst_rect.width = state.screen_width;
@@ -159,19 +163,20 @@ int piguChangeResolution(int width, int height)
    src_rect.y = 0;
    src_rect.width = width << 16;
    src_rect.height = height << 16;        
+   */
 
-   DISPMANX_UPDATE_HANDLE_T dispman_update = vc_dispmanx_update_start( 0 );
+   //DISPMANX_UPDATE_HANDLE_T dispman_update = vc_dispmanx_update_start( 0 );
 
-   vc_dispmanx_element_remove(dispman_update, state.dispman_element);
+   //vc_dispmanx_element_remove(dispman_update, state.dispman_element);
       
-   state.dispman_element = vc_dispmanx_element_add ( dispman_update, state.dispman_display, 0/*layer*/, &dst_rect, 0/*src*/, &src_rect, DISPMANX_PROTECTION_NONE, 0 /*alpha*/, 0/*clamp*/, (DISPMANX_TRANSFORM_T)0/*transform*/);
+   //state.dispman_element = vc_dispmanx_element_add ( dispman_update, state.dispman_display, 0/*layer*/, &dst_rect, 0/*src*/, &src_rect, DISPMANX_PROTECTION_NONE, 0 /*alpha*/, 0/*clamp*/, (DISPMANX_TRANSFORM_T)0/*transform*/);
       
-   state.nativewindow.element = state.dispman_element;
-   state.nativewindow.width = width;
-   state.nativewindow.height = height;
-   vc_dispmanx_update_submit_sync( dispman_update );
+   //state.nativewindow.element = state.dispman_element;
+   //state.nativewindow.width = width;
+   //state.nativewindow.height = height;
+   //vc_dispmanx_update_submit_sync( dispman_update );
 
-   state.surface = eglCreateWindowSurface( state.display, state.config, &state.nativewindow, NULL );
+   state.surface = eglCreateWindowSurface( state.display, state.config, state.nativewindow, NULL );
    if(state.surface == EGL_NO_SURFACE)
       return -1;
 
@@ -192,11 +197,11 @@ void piguCloseWindow()
 
    eglDestroySurface(state.display, state.surface);
 
-   DISPMANX_UPDATE_HANDLE_T dispman_update = vc_dispmanx_update_start( 0 );
-   vc_dispmanx_element_remove(dispman_update, state.dispman_element);
-   vc_dispmanx_update_submit_sync( dispman_update );
+   //DISPMANX_UPDATE_HANDLE_T dispman_update = vc_dispmanx_update_start( 0 );
+   //vc_dispmanx_element_remove(dispman_update, state.dispman_element);
+   //vc_dispmanx_update_submit_sync( dispman_update );
 
-   vc_dispmanx_display_close(state.dispman_display);
+   //vc_dispmanx_display_close(state.dispman_display);
 
    eglDestroyContext(state.display, state.context);
 

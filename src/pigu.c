@@ -9,7 +9,7 @@
 int piguInit()
 {
    int i;
-   bcm_host_init();
+   //bcm_host_init();
 
    memset(&state, 0, sizeof(state));
    state.keyboard[0].fd = -1;
@@ -71,5 +71,5 @@ void piguTerminate()
       if(state.controller[i].fd >= 0)
 	 close(state.controller[i].fd);
 
-   bcm_host_deinit();
+   //bcm_host_deinit();
 }

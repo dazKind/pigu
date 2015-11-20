@@ -1,9 +1,9 @@
 /* OpenGL example code - Perspective
- * 
- * set up a perspective projection and render a rotating cube
- * 
- * Autor: Jakob Progsch
- */
+* 
+* set up a perspective projection and render a rotating cube
+* 
+* Autor: Jakob Progsch
+*/
 
 #include <iostream>
 #include <linux/input.h>
@@ -61,24 +61,24 @@ bool check_program_link_status(GLuint obj)
 
 int main()
 {
-   // init the library
-   piguInit();
-   
-   int width, height;
-   piguGetScreenSize(&width, &height);
-   float aspect = static_cast<float>(width)/height;
+    // init the library
+    piguInit();
 
-   // create the window
-   if(piguCreateWindow(width, height, 8, 8, 8, 8, 24, 8, 0)<0)
-   {
-      std::cerr << "failed to create window" << std::endl;
-      return 1;
-   }
-   
-   // vsync
-   piguSwapInterval(1);
+    int width, height;
+    piguGetScreenSize(&width, &height);
+    float aspect = static_cast<float>(width)/height;
 
-   // shader source code
+    // create the window
+    if(piguCreateWindow(width, height, 8, 8, 8, 8, 24, 8, 0)<0)
+    {
+        std::cerr << "failed to create window" << std::endl;
+        return 1;
+    }
+
+    // vsync
+    piguSwapInterval(1);
+
+    // shader source code
     std::string vertex_source =
         "uniform mat4 ViewProjection;\n" // the projection matrix uniform
         "attribute vec4 vposition;\n"
@@ -88,16 +88,16 @@ int main()
         "   fcolor = vcolor;\n"
         "   gl_Position = ViewProjection*vposition;\n"
         "}\n";
-        
-    std::string fragment_source =
+
+        std::string fragment_source =
         "varying vec4 fcolor;\n"
         "void main() {\n"
         "   gl_FragColor = fcolor;\n"
         "}\n";
-   
+
     // program and shader handles
     GLuint shader_program, vertex_shader, fragment_shader;
-    
+
     // we need these to properly pass the strings
     const char *source;
     int length;
@@ -110,10 +110,10 @@ int main()
     glCompileShader(vertex_shader);
     if(!check_shader_compile_status(vertex_shader))
     {
-       std::cerr << "failed to compile vertex shader" << std::endl;
-       return 1;
+        std::cerr << "failed to compile vertex shader" << std::endl;
+        return 1;
     }
- 
+
     // create and compiler fragment shader
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     source = fragment_source.c_str();
@@ -122,17 +122,17 @@ int main()
     glCompileShader(fragment_shader);
     if(!check_shader_compile_status(fragment_shader))
     {
-       std::cerr << "failed to compile fragment shader" << std::endl;
-       return 1;
+        std::cerr << "failed to compile fragment shader" << std::endl;
+        return 1;
     }
-    
+
     // create program
     shader_program = glCreateProgram();
-    
+
     // attach shaders
     glAttachShader(shader_program, vertex_shader);
     glAttachShader(shader_program, fragment_shader);
-    
+
     glBindAttribLocation(shader_program, 0, "vposition");
     glBindAttribLocation(shader_program, 1, "vcolor");
 
@@ -140,79 +140,79 @@ int main()
     glLinkProgram(shader_program);
     if(!check_program_link_status(shader_program))
     {
-       std::cerr << "failed to link shaders" << std::endl;
-       return 1;
+        std::cerr << "failed to link shaders" << std::endl;
+        return 1;
     }
 
-   
+
     // obtain location of projection uniform
     GLint ViewProjection_location = glGetUniformLocation(shader_program, "ViewProjection");
-    
-    
+
+
     // vao and vbo handle
     GLuint vbo, ibo;
- 
-    
+
+
     // generate and bind the vertex buffer object
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            
+
     // data for a cube
     GLfloat vertexData[] = {
-    //  X     Y     Z           R     G     B
-    // face 0:
-       1.0f, 1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 0
-      -1.0f, 1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 1
-       1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 2
-      -1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 3
+        //  X     Y     Z           R     G     B
+        // face 0:
+        1.0f, 1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 0
+        -1.0f, 1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 1
+        1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 2
+        -1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 3
 
-    // face 1:
-       1.0f, 1.0f, 1.0f,       0.0f, 1.0f, 0.0f, // vertex 0
-       1.0f,-1.0f, 1.0f,       0.0f, 1.0f, 0.0f, // vertex 1
-       1.0f, 1.0f,-1.0f,       0.0f, 1.0f, 0.0f, // vertex 2
-       1.0f,-1.0f,-1.0f,       0.0f, 1.0f, 0.0f, // vertex 3
+        // face 1:
+        1.0f, 1.0f, 1.0f,       0.0f, 1.0f, 0.0f, // vertex 0
+        1.0f,-1.0f, 1.0f,       0.0f, 1.0f, 0.0f, // vertex 1
+        1.0f, 1.0f,-1.0f,       0.0f, 1.0f, 0.0f, // vertex 2
+        1.0f,-1.0f,-1.0f,       0.0f, 1.0f, 0.0f, // vertex 3
 
-    // face 2:
-       1.0f, 1.0f, 1.0f,       0.0f, 0.0f, 1.0f, // vertex 0
-       1.0f, 1.0f,-1.0f,       0.0f, 0.0f, 1.0f, // vertex 1
-      -1.0f, 1.0f, 1.0f,       0.0f, 0.0f, 1.0f, // vertex 2
-      -1.0f, 1.0f,-1.0f,       0.0f, 0.0f, 1.0f, // vertex 3
-      
-    // face 3:
-       1.0f, 1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 0
-       1.0f,-1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 1
-      -1.0f, 1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 2
-      -1.0f,-1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 3
+        // face 2:
+        1.0f, 1.0f, 1.0f,       0.0f, 0.0f, 1.0f, // vertex 0
+        1.0f, 1.0f,-1.0f,       0.0f, 0.0f, 1.0f, // vertex 1
+        -1.0f, 1.0f, 1.0f,       0.0f, 0.0f, 1.0f, // vertex 2
+        -1.0f, 1.0f,-1.0f,       0.0f, 0.0f, 1.0f, // vertex 3
 
-    // face 4:
-      -1.0f, 1.0f, 1.0f,       0.0f, 1.0f, 1.0f, // vertex 0
-      -1.0f, 1.0f,-1.0f,       0.0f, 1.0f, 1.0f, // vertex 1
-      -1.0f,-1.0f, 1.0f,       0.0f, 1.0f, 1.0f, // vertex 2
-      -1.0f,-1.0f,-1.0f,       0.0f, 1.0f, 1.0f, // vertex 3
+        // face 3:
+        1.0f, 1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 0
+        1.0f,-1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 1
+        -1.0f, 1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 2
+        -1.0f,-1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 3
 
-    // face 5:
-       1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 1.0f, // vertex 0
-      -1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 1.0f, // vertex 1
-       1.0f,-1.0f,-1.0f,       1.0f, 0.0f, 1.0f, // vertex 2
-      -1.0f,-1.0f,-1.0f,       1.0f, 0.0f, 1.0f, // vertex 3
+        // face 4:
+        -1.0f, 1.0f, 1.0f,       0.0f, 1.0f, 1.0f, // vertex 0
+        -1.0f, 1.0f,-1.0f,       0.0f, 1.0f, 1.0f, // vertex 1
+        -1.0f,-1.0f, 1.0f,       0.0f, 1.0f, 1.0f, // vertex 2
+        -1.0f,-1.0f,-1.0f,       0.0f, 1.0f, 1.0f, // vertex 3
+
+        // face 5:
+        1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 1.0f, // vertex 0
+        -1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 1.0f, // vertex 1
+        1.0f,-1.0f,-1.0f,       1.0f, 0.0f, 1.0f, // vertex 2
+        -1.0f,-1.0f,-1.0f,       1.0f, 0.0f, 1.0f, // vertex 3
     }; // 6 faces with 4 vertices with 6 components (floats)
 
     // fill with data
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*6*4*6, vertexData, GL_STATIC_DRAW);
-                    
-           
+
+
     // set up generic attrib pointers
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
- 
+
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (char*)0 + 3*sizeof(GLfloat));
-    
-    
+
+
     // generate and bind the index buffer object
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-            
+
     GLushort indexData[] = {
         // face 0:
         0,1,2,      // first triangle
@@ -236,7 +236,7 @@ int main()
 
     // fill with data
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort)*6*2*3, indexData, GL_STATIC_DRAW);
-        
+
     // we are drawing 3d objects so we want depth testing
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
@@ -248,61 +248,61 @@ int main()
         // get the time in seconds
         float t = piguGetTime();
 
-	// poll events so key state is updated
-	piguPollEvents();
-	
+        // poll events so key state is updated
+        piguPollEvents();
+
         // terminate on escape 
         if(piguIsKeyDown(KEY_ESC))
         {
-	   running = false;
+            running = false;
         }
-        
+
         // clear first
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         // use the shader program
         glUseProgram(shader_program);
 
         // calculate ViewProjection matrix
         glm::mat4 Projection = glm::perspective(90.0f, aspect, 0.1f, 100.f);
-        
+
         // translate the world/view position
         glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
-        
+
         // make the camera rotate around the origin
         View = glm::rotate(View, 90.0f*t, glm::vec3(1.0f, 1.0f, 1.0f)); 
-        
+
         glm::mat4 ViewProjection = Projection*View;
-        
+
         // set the uniform
         glUniformMatrix4fv(ViewProjection_location, 1, GL_FALSE, glm::value_ptr(ViewProjection)); 
-       
+
         // draw
         glDrawElements(GL_TRIANGLES, 6*6, GL_UNSIGNED_SHORT, 0);
-       
+
         // check for errors
         GLenum error = glGetError();
         if(error != GL_NO_ERROR)
         {
-	    std::cerr << "error: " << error << std::endl;
-	    running = false;       
+            std::cerr << "error: " << error << std::endl;
+            running = false;       
         }
-        
+
         // finally swap buffers
         piguSwapBuffers();       
     }
-    
+
     // delete the created objects
-        
+
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ibo);
-    
+
     glDetachShader(shader_program, vertex_shader);	
     glDetachShader(shader_program, fragment_shader);
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
     glDeleteProgram(shader_program);
-    
+
     piguTerminate();
 
     return 0;

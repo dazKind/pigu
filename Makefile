@@ -1,6 +1,6 @@
-CFLAGS+=-O3 -march=armv6 -mfpu=vfp -mfloat-abi=hard -Wall -Wextra
-LDFLAGS+=-L/opt/vc/lib -lGLESv2 -lEGL -lbcm_host -lvcos
-INCLUDES+=-I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -Iinclude
+CFLAGS+=-O3 -march=armv7 -mfpu=vfp -mfloat-abi=hard -Wall -Wextra
+LDFLAGS+=-lGLESv2 -lEGL
+INCLUDES+=-Iinclude
 SRC=src/state.c src/graphics.c src/input.c src/pigu.c src/time.c
 OBJ=${SRC:.c=.o}
 
